@@ -40,4 +40,13 @@ function AlreadyBoughtController(ShoppingListCheckOffService) {
   alreadyBoughtController.list = ShoppingListCheckOffService.boughtList;
 }
 
+function testeDeEscopo() {
+  this.value = "a";
+  function innerScope() {
+    this.value = "b";
+    console.log(this.value);
+  }
+  new innerScope();
+}
+new testeDeEscopo();
 })();
