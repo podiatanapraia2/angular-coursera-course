@@ -10,7 +10,7 @@ MenuSearchService.$inject = ['$http'];
 function MenuSearchService($http) {
   var service = this;
 
-  service.getMatchedMenuItems = function (searchTerm) {
+  service.getMatchedMenuItems = function(searchTerm) {
     return $http({
         url: "https://davids-restaurant.herokuapp.com/menu_items.json"
       }).then(narrowDownResult);
@@ -33,20 +33,42 @@ NarrowItDownController.$inject = ['MenuSearchService'];
 function NarrowItDownController(MenuSearchService) {
   var controller = this;
   controller.found = [];
-  controller.narrowItDown = MenuSearchService.getMatchedMenuItems("meat")
-  .then(function (result) {
-      controller.found = result;
-  });
+  controller.nothingFound = false;
+  controller.searchTerm = ""
+  controller.narrowItDown = function() {
+    if (controller.searchTerm !== "") {
+      MenuSearchService.getMatchedMenuItems(controller.searchTerm)
+      .then(function (result) {
+        controller.found = result;
+        controller.nothingFound = (controller.found.length === 0);
+      });
+    }
+    else {
+      controller.found = [];
+      controller.nothingFound = true;
+    }
+  }
+  controller.remove = function(index) {
+    controller.found.splice(index, 1);
+  }
 }
 
 function FoundItemsDirective() {
   var ddo = {
     templateUrl: 'foundItems.html',
     scope: {
-      items: '<'
-    }
+      items: '<',
+      removeItem: '&',
+      nothingFound: '<'
+    },
+    controller: FoundItemsDirectiveController,
+    controllerAs: 'foundItems',
+    bindToController: true
   }
-
   return ddo;
 }
+
+function FoundItemsDirectiveController() {
+}
+
 })();
